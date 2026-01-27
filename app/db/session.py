@@ -7,3 +7,6 @@ if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is not set")
 
 engine = create_async_engine(DATABASE_URL, echo=False)
+
+print("DATABASE_URL =", repr(DATABASE_URL))
+
