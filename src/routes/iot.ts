@@ -93,3 +93,67 @@ export async function iotRoutes(app: FastifyInstance) {
     }
   );
 }
+
+  // Loxone ingest endpoint
+  app.post(
+    "/ingest",
+    { preHandler: app.requireApiKey },
+    async (req, reply) => {
+      const body = req.body as {
+        device: string;
+        sensor: string;
+        value: number;
+      };
+
+      if (!body?.device || !body?.sensor || typeof body?.value !== "number") {
+        return reply.code(400).send({
+          error: "device, sensor and numeric value are required"
+        });
+      }
+
+      // 1️⃣ Device zoeken of aanmaken
+      let device = await app.prisma.device.findFirst({
+        where: {
+          name: body.device,
+          projectId: req.project.id
+        }
+      });
+
+      if (!device) {
+        device = await app.prisma.device.create({
+          data: {
+            name: body.device,
+            type: "generic",
+            projectId: req.project.id
+          }
+        });
+      }
+
+      // 2️⃣ Sensor zoeken of aanmaken
+      let sensor = await app.prisma.sensor.findFirst({
+        where: {
+          name: body.sensor,
+          deviceId: device.id
+        }
+      });
+
+      if (!sensor) {
+        sensor = await app.prisma.sensor.create({
+          data: {
+            name: body.sensor,
+            deviceId: device.id
+          }
+        });
+      }
+
+      // 3️⃣ Reading opslaan
+      await app.prisma.reading.create({
+        data: {
+          value: body.value,
+          sensorId: sensor.id
+        }
+      });
+
+      return { success: true };
+    }
+  );
