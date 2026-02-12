@@ -9,7 +9,9 @@
   "dependencies": {
     "fastify": "^5.0.0",
     "pino": "^9.0.0",
-    "@prisma/client": "^6.0.0"
+    "@prisma/client": "^6.0.0",
+    "fastify-plugin": "^5.0.0"
+
   },
   "devDependencies": {
     "typescript": "^5.5.4",
