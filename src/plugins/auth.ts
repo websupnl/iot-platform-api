@@ -12,7 +12,7 @@ declare module "fastify" {
 }
 
 export default fp(async function authPlugin(app: FastifyInstance) {
-  app.decorateRequest("project", null);
+  app.decorateRequest("project", null as any);
 
   app.decorate("requireApiKey", async (req, reply) => {
     const raw = req.headers["x-api-key"];
