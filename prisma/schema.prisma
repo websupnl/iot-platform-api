@@ -11,37 +11,58 @@ model Project {
   id        String   @id @default(uuid())
   name      String
   slug      String   @unique
-  devices   Device[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  devices   Device[]
+  apiKeys   ApiKey[]
+}
+
+model ApiKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  projectId String
+  createdAt DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model Device {
   id        String   @id @default(uuid())
   name      String
-  type      String   // laadpaal, omvormer, relais
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type      String   // "laadpaal", "omvormer", "relais", etc
   projectId String
-  sensors   Sensor[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sensors   Sensor[]
+
+  @@index([projectId])
 }
 
 model Sensor {
   id        String   @id @default(uuid())
-  name      String
-  unit      String   // kW, V, A, %
-  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  name      String   // "power", "status", "energy"
+  unit      String?  // "kW", "V", "A", "%"
   deviceId  String
-  readings  Reading[]
   createdAt DateTime @default(now())
+
+  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  readings  Reading[]
+
+  @@index([deviceId])
+  @@unique([deviceId, name]) // binnen 1 device geen dubbele sensornaam
 }
 
 model Reading {
   id        String   @id @default(uuid())
   value     Float
-  sensor    Sensor   @relation(fields: [sensorId], references: [id], onDelete: Cascade)
   sensorId  String
   createdAt DateTime @default(now())
+
+  sensor    Sensor   @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+
+  @@index([sensorId, createdAt])
 }
 
