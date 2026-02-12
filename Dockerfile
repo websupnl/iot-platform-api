@@ -1,16 +1,25 @@
-FROM python:3.11-slim
-
-ARG DATABASE_URL
-ENV DATABASE_URL=${DATABASE_URL}
-
+# ---------- Install dependencies ----------
+FROM node:20-alpine AS deps
 WORKDIR /app
+COPY package*.json ./
+RUN npm install
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# ---------- Build ----------
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# ---------- Production ----------
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
 
-COPY ./app ./app
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY package.json ./
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000"]
+EXPOSE 3000
+
+CMD ["node", "dist/index.js"]
