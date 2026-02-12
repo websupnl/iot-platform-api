@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import prismaPlugin from "./plugins/prisma.js";
+import { projectRoutes } from "./routes/project.js";
 
 export function buildServer() {
   const app = Fastify({
@@ -11,6 +12,9 @@ export function buildServer() {
 
   // Prisma plugin registreren
   app.register(prismaPlugin);
+
+  // Project routes registreren
+  app.register(projectRoutes);
 
   // Health endpoint
   app.get("/health", async () => {
