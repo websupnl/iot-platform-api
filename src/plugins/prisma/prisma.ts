@@ -1,5 +1,6 @@
 import fp from "fastify-plugin";
 import { PrismaClient } from "@prisma/client";
+import { FastifyInstance } from "fastify";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -7,7 +8,7 @@ declare module "fastify" {
   }
 }
 
-export default fp(async (app) => {
+export default fp(async function (app: FastifyInstance) {
   const prisma = new PrismaClient();
   await prisma.$connect();
 

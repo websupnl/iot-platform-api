@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import prismaPlugin from "./plugins/prisma.js";
+import prismaPlugin from "./plugins/prisma";
 
 export function buildServer() {
   const app = Fastify({
