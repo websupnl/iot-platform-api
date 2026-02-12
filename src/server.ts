@@ -12,19 +12,11 @@ export function buildServer() {
     },
     trustProxy: true
   });
-
-  // Prisma plugin registreren
-  app.register(prismaPlugin);
-
   app.register(prismaPlugin);
   app.register(authPlugin);
 
   app.register(projectRoutes);
   app.register(iotRoutes, { prefix: "/api" });
-
-
-  // Project routes registreren
-  app.register(projectRoutes);
 
   // Health endpoint
   app.get("/health", async () => {
