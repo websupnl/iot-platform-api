@@ -8,43 +8,40 @@ datasource db {
 }
 
 model Project {
-  id          String     @id @default(uuid())
-  name        String
-  slug        String     @unique
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  locations   Location[]
-  apiKeys     ApiKey[]
-}
-
-model Location {
-  id          String     @id @default(uuid())
-  name        String
-  description String?
-  projectId   String
-  createdAt   DateTime   @default(now())
-
-  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  devices     Device[]
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  devices   Device[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Device {
-  id          String    @id @default(uuid())
-  name        String
-  type        String
-  locationId  String
-  createdAt   DateTime  @default(now())
-
-  location    Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid())
+  name      String
+  type      String   // laadpaal, omvormer, relais
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  sensors   Sensor[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model ApiKey {
-  id         String   @id @default(uuid())
-  key        String   @unique
-  projectId  String
-  createdAt  DateTime @default(now())
+model Sensor {
+  id        String   @id @default(uuid())
+  name      String
+  unit      String   // kW, V, A, %
+  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  deviceId  String
+  readings  Reading[]
+  createdAt DateTime @default(now())
+}
 
-  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+model Reading {
+  id        String   @id @default(uuid())
+  value     Float
+  sensor    Sensor   @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+  sensorId  String
+  createdAt DateTime @default(now())
 }
 
