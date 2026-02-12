@@ -9,7 +9,7 @@ export function buildServer() {
     trustProxy: true
   });
 
-  // 🔌 Prisma registreren
+  // Prisma plugin registreren
   app.register(prismaPlugin);
 
   // Health endpoint
@@ -17,7 +17,7 @@ export function buildServer() {
     return { status: "ok" };
   });
 
-  // DB health check
+  // DB health endpoint
   app.get("/health/db", async () => {
     await app.prisma.project.count();
     return { db: "ok" };
