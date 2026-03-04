@@ -22,32 +22,25 @@ export async function adminRoutes(app: FastifyInstance) {
     });
   });
 
-  app.post("/admin/projects", async (req, reply) => {
+app.post("/projects", async (request, reply) => {
 
-    const body = req.body as {
-      name: string
-      slug: string
-    };
-
-    if (!body?.name || !body?.slug) {
-      return reply.code(400).send({
-        error: "name and slug are required"
-      });
-    }
-
-    const project = await app.prisma.project.create({
-  data: {
-    name,
-    slug,
-    apiKeys: {
-      create: {
-        key: generatedKey
+  const project = await app.prisma.project.create({
+    data: {
+      name,
+      slug,
+      apiKeys: {
+        create: {
+          key: generatedKey
+        }
       }
+    },
+    include: {
+      apiKeys: true
     }
-  },
-  include: {
-    apiKeys: true
-  }
+  });
+
+  reply.send(project);
+
 });
 
   app.delete("/admin/projects/:projectId", async (req, reply) => {
