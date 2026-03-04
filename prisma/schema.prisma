@@ -15,7 +15,7 @@ model Project {
   updatedAt DateTime @updatedAt
 
   devices   Device[]
-  apiKeys   ApiKey[]   // ← DEZE ONTBREEKT BIJ JOU
+  apiKeys   ApiKey[] @relation("ProjectApiKeys")
 }
 
 model ApiKey {
@@ -24,13 +24,15 @@ model ApiKey {
   projectId String
   createdAt DateTime @default(now())
 
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project  @relation("ProjectApiKeys", fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
 }
 
 model Device {
   id        String   @id @default(uuid())
   name      String
-  type      String   // "laadpaal", "omvormer", "relais", etc
+  type      String
   projectId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -43,16 +45,14 @@ model Device {
 
 model Sensor {
   id        String   @id @default(uuid())
-  name      String   // "power", "status", "energy"
-  unit      String?  // "kW", "V", "A", "%"
+  name      String
+  unit      String?
   deviceId  String
   createdAt DateTime @default(now())
 
   device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
-  readings  Reading[]
 
   @@index([deviceId])
-  @@unique([deviceId, name]) // binnen 1 device geen dubbele sensornaam
 }
 
 model Reading {
