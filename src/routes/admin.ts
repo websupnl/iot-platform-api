@@ -36,15 +36,19 @@ export async function adminRoutes(app: FastifyInstance) {
     }
 
     const project = await app.prisma.project.create({
-      data: {
-        name: body.name,
-        slug: body.slug,
-        apiKey: generateApiKey()
+  data: {
+    name,
+    slug,
+    apiKeys: {
+      create: {
+        key: generatedKey
       }
-    });
-
-    return project;
-  });
+    }
+  },
+  include: {
+    apiKeys: true
+  }
+});
 
   app.delete("/admin/projects/:projectId", async (req, reply) => {
 
