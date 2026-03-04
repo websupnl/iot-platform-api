@@ -25,16 +25,3 @@ COPY package.json ./
 EXPOSE 3000
 
 CMD ["sh", "-c", "npx prisma db push && node dist/index.js"]
-
-FROM node:20-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/prisma ./prisma
-COPY package.json ./
-COPY docker-entrypoint.sh ./
-
-EXPOSE 3000
-CMD ["sh", "./docker-entrypoint.sh"]
