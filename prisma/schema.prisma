@@ -11,11 +11,11 @@ model Project {
   id        String   @id @default(uuid())
   name      String
   slug      String   @unique
-  apiKey    String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   devices   Device[]
+  apiKeys   ApiKey[]   // ← DEZE ONTBREEKT BIJ JOU
 }
 
 model ApiKey {
