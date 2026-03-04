@@ -3,7 +3,7 @@ import prismaPlugin from "./plugins/prisma.js";
 import { projectRoutes } from "./routes/project.js";
 import authPlugin from "./plugins/auth.js";
 import { iotRoutes } from "./routes/iot.js";
-
+import { adminRoutes } from "./routes/admin.js";
 
 export function buildServer() {
   const app = Fastify({
@@ -12,11 +12,15 @@ export function buildServer() {
     },
     trustProxy: true
   });
+
   app.register(prismaPlugin);
   app.register(authPlugin);
 
   app.register(projectRoutes);
   app.register(iotRoutes, { prefix: "/api" });
+
+  // nieuw
+  app.register(adminRoutes);
 
   // Health endpoint
   app.get("/health", async () => {
