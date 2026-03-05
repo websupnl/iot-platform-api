@@ -130,3 +130,38 @@ export async function iotRoutes(app: FastifyInstance) {
   });
 
 }
+
+export async function iotRoutes(app: FastifyInstance) {
+
+  // ----------------------------
+  // Ingest data
+  // ----------------------------
+
+  app.post("/api/ingest", async (req, reply) => {
+    ...
+  })
+
+
+  // ----------------------------
+  // Get sensor readings
+  // ----------------------------
+
+  app.get("/api/sensors/:sensorId/readings", async (req, reply) => {
+
+    const { sensorId } = req.params as {
+      sensorId: string
+    };
+
+    const readings = await app.prisma.reading.findMany({
+      where: { sensorId },
+      orderBy: {
+        createdAt: "desc"
+      },
+      take: 100
+    });
+
+    return readings;
+
+  });
+
+}
