@@ -78,61 +78,55 @@ export async function iotRoutes(app: FastifyInstance) {
     });
   });
 
-  // ✅ Loxone ingest endpoint
-  app.post("/ingest", { preHandler: app.requireApiKey }, async (req, reply) => {
-    const body = req.body as {
-      device: string;
-      sensor: string;
-      value: number;
+    app.post("/ingest", async (request, reply) => {
+
+    const body = request.body as {
+      apiKey: string
+      sensorId: string
+      value: number
     };
 
-    if (!body?.device || !body?.sensor || typeof body?.value !== "number") {
+    if (!body?.apiKey || !body?.sensorId || body.value === undefined) {
       return reply.code(400).send({
-        error: "device, sensor and numeric value are required"
+        error: "apiKey, sensorId and value required"
       });
     }
 
-    let device = await app.prisma.device.findFirst({
-      where: {
-        name: body.device,
-        projectId: req.project.id
-      }
+    // API key controleren
+    const apiKey = await app.prisma.apiKey.findUnique({
+      where: { key: body.apiKey }
     });
 
-    if (!device) {
-      device = await app.prisma.device.create({
-        data: {
-          name: body.device,
-          type: "generic",
-          projectId: req.project.id
-        }
+    if (!apiKey) {
+      return reply.code(401).send({
+        error: "Invalid API key"
       });
     }
 
-    let sensor = await app.prisma.sensor.findFirst({
-      where: {
-        name: body.sensor,
-        deviceId: device.id
-      }
+    // Sensor controleren
+    const sensor = await app.prisma.sensor.findUnique({
+      where: { id: body.sensorId }
     });
 
     if (!sensor) {
-      sensor = await app.prisma.sensor.create({
-        data: {
-          name: body.sensor,
-          deviceId: device.id
-        }
+      return reply.code(404).send({
+        error: "Sensor not found"
       });
     }
 
-    await app.prisma.reading.create({
+    // Reading opslaan
+    const reading = await app.prisma.reading.create({
       data: {
         value: body.value,
         sensorId: sensor.id
       }
     });
 
-    return { success: true };
+    return {
+      success: true,
+      reading
+    };
+
   });
 
 }
