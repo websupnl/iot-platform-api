@@ -131,7 +131,6 @@ export async function iotRoutes(app: FastifyInstance) {
 
 }
 
-export async function iotRoutes(app: FastifyInstance) {
 
   // ----------------------------
   // Ingest data
