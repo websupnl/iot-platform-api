@@ -51,7 +51,7 @@ model Sensor {
   createdAt DateTime @default(now())
 
   device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
-  readings  Reading[]   // ← DEZE TOEVOEGEN
+  readings  Reading[]
 
   @@index([deviceId])
 }
@@ -65,5 +65,5 @@ model Reading {
   sensor    Sensor   @relation(fields: [sensorId], references: [id], onDelete: Cascade)
 
   @@index([sensorId])
+  @@index([createdAt])
 }
-
